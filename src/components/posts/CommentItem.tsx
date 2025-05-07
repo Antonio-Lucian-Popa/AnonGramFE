@@ -50,7 +50,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-medium text-gray-300">Anonymous</p>
+              <p className="font-medium text-gray-300">{user?.alias}</p>
               <p className="text-xs text-gray-500">{formattedDate}</p>
             </div>
             

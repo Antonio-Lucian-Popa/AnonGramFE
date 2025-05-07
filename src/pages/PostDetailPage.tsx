@@ -4,7 +4,7 @@ import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { getPostById } from '../services/posts';
 import { getPostComments } from '../services/comments';
-import { Post, Comment, PaginatedResponse } from '../types';
+import { Post, Comment } from '../types';
 import { PostCard } from '../components/posts/PostCard';
 import { CommentForm } from '../components/posts/CommentForm';
 import { CommentItem } from '../components/posts/CommentItem';

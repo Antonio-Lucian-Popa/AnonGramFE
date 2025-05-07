@@ -87,7 +87,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
                 A
               </div>
               <div>
-                <p className="font-medium text-indigo-400">Anonymous</p>
+                <p className="font-medium text-indigo-400">{ user?.alias}</p>
                 <p className="text-xs text-gray-400">{formattedDate}</p>
               </div>
             </div>
