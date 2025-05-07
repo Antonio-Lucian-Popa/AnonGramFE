@@ -72,6 +72,26 @@ export const votePost = async (voteData: VoteRequest): Promise<boolean> => {
   }
 };
 
+export const togglePostVote = async (postId: string, userId: string, voteType: 1 | -1): Promise<void> => {
+  try {
+    // Check if user already voted the same way
+    const response = await api.get(`/votes/${postId}?userId=${userId}`);
+    const existingVote = response.data;
+
+    if (existingVote && existingVote.voteType === voteType) {
+      // Same vote => remove it
+      await api.delete(`/votes/${existingVote.id}`);
+    } else {
+      // New or changed vote => send new one
+      const vote: VoteRequest = { postId, userId, voteType };
+      await api.post('/votes', vote);
+    }
+  } catch (error) {
+    console.error('Toggle vote error:', error);
+    throw error;
+  }
+}
+
 // Report a post
 export const reportPost = async (reportData: ReportCreateRequest): Promise<boolean> => {
   try {

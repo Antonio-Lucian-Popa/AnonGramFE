@@ -6,6 +6,7 @@ import { Post } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { votePost, deletePost } from '../../services/posts';
 import { ReportModal } from './ReportModal';
+import api from '../../services/api';
 
 interface PostCardProps {
   post: Post;
@@ -29,16 +30,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
 
   const handleVote = async (voteType: 1 | -1) => {
     if (!user) return;
-    
+  
     setLoading(true);
     try {
-      // Toggle vote if already voted the same way
-      const newVoteType = userVote === voteType ? null : voteType;
-      
-      if (newVoteType === null) {
-        // TODO: Handle removing vote in the backend
+      if (userVote === voteType) {
+        // A apăsat din nou pe același vot => ștergem votul
+        await api.delete(`/votes/${post.id}?userId=${user.id}`);
         setUserVote(null);
       } else {
+        // Fie e prima dată, fie schimbă votul
         await votePost({
           postId: post.id,
           userId: user.id,
@@ -46,9 +46,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
         });
         setUserVote(voteType);
       }
-      
+  
       if (onPostUpdated) {
-        onPostUpdated();
+        onPostUpdated(); // ca să updatezi scorul la post
       }
     } catch (error) {
       console.error('Vote error:', error);
@@ -56,6 +56,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
       setLoading(false);
     }
   };
+  
 
   const handleDelete = async () => {
     if (!user || !isAuthor) return;
