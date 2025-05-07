@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, MapPin, Users } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
@@ -24,6 +24,25 @@ const Feature: React.FC<{
 export const HomePage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setLoading(false);
+    }, 500); // Delay de 0.5 secunde pentru UX mai plăcut (sau până se încarcă ceva real)
+
+    return () => clearTimeout(delay);
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500"></div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
