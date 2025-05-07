@@ -11,7 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 // Register a new user
 export const register = async (userData: UserRegisterRequest): Promise<boolean> => {
   try {
-    await api.post('/users/register', userData);
+    await api.post('/auth/register', userData);
     return true;
   } catch (error) {
     console.error('Registration error:', error);
@@ -22,7 +22,7 @@ export const register = async (userData: UserRegisterRequest): Promise<boolean> 
 // Login user
 export const login = async (credentials: UserLoginRequest): Promise<boolean> => {
   try {
-    const response = await api.post<TokenResponse>('/users/login', credentials);
+    const response = await api.post<TokenResponse>('/auth/login', credentials);
     
     // Store tokens
     localStorage.setItem('access_token', response.data.access_token);
@@ -45,7 +45,7 @@ export const refreshToken = async (): Promise<boolean> => {
   
   try {
     const response = await api.post<TokenResponse>(
-      '/users/refresh',
+      '/auth/refresh',
       { refresh_token: refresh }
     );
     

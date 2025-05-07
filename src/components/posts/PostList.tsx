@@ -28,9 +28,9 @@ export const PostList: React.FC<PostListProps> = ({
       const response = await fetchPosts(pageToLoad, 10);
       
       if (pageToLoad === 0) {
-        setPosts(response.content ?? []);
+        setPosts(response.content || []);
       } else {
-        setPosts(prev => [...prev, ...(response.content ?? [])]);
+        setPosts(prev => [...prev, ...(response.content || [])]);
       }
       
       setHasMore(!response.last);
@@ -90,7 +90,7 @@ export const PostList: React.FC<PostListProps> = ({
     );
   }
 
-  if (!loading && posts.length === 0) {
+  if (!loading && (!posts || posts.length === 0)) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-400">{emptyMessage}</p>

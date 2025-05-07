@@ -12,8 +12,6 @@ export interface UserRegisterRequest {
   email: string;
   password: string;
   alias: string;
-  firstName: string;
-  lastName: string;
   userRole: 'USER';
 }
 
