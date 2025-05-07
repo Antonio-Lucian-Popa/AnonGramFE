@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosRequestConfig } from 'axios';
 import { refreshToken } from './auth';
+import { API_URL } from '../utils/constants';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
