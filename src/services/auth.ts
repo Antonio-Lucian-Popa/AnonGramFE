@@ -36,27 +36,24 @@ export const login = async (credentials: UserLoginRequest): Promise<boolean> => 
 };
 
 // Refresh token
-export const refreshToken = async (): Promise<boolean> => {
+export const refreshToken = async (): Promise<TokenResponse | null> => {
   const refresh = localStorage.getItem('refresh_token');
-  
-  if (!refresh) {
-    return false;
-  }
-  
+  if (!refresh) return null;
+
   try {
-    const response = await api.post<TokenResponse>(
-      '/auth/refresh',
-      { refresh_token: refresh }
-    );
-    
-    // Update tokens
-    localStorage.setItem('access_token', response.data.access_token);
-    localStorage.setItem('refresh_token', response.data.refresh_token);
-    
-    return true;
+    const response = await api.post<TokenResponse>('/auth/refresh', {
+      refresh_token: refresh
+    });
+
+    const tokens = response.data;
+
+    localStorage.setItem('access_token', tokens.access_token);
+    localStorage.setItem('refresh_token', tokens.refresh_token);
+
+    return tokens;
   } catch (error) {
     console.error('Token refresh error:', error);
-    return false;
+    return null;
   }
 };
 

@@ -28,31 +28,30 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    // If error is 401 and we haven't retried yet
+
+    // Evită bucla infinită
+    if (originalRequest.url.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
+    // Dacă e 401 și nu s-a mai retrimis
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
-        // Try to refresh the token
         const refreshed = await refreshToken();
-        
+
         if (refreshed) {
-          // Update token in the request
-          const token = localStorage.getItem('access_token');
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          
-          // Retry the original request
-          return axios(originalRequest);
+          originalRequest.headers.Authorization = `Bearer ${refreshed.access_token}`;
+          return api(originalRequest);
         }
       } catch (refreshError) {
-        // If refresh fails, redirect to login
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
