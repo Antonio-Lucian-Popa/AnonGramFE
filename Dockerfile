@@ -29,7 +29,7 @@ RUN npm install -g serve
 COPY --from=builder /app/dist /app/dist
 
 # Portul pe care o să servească aplicația (match la nginx proxy_pass 8083)
-EXPOSE 8083
+EXPOSE 8085
 
 # Comanda de start
-CMD ["serve", "-s", "dist", "-l", "8083"]
+CMD ["serve", "-s", "dist", "-l", "8085"]
