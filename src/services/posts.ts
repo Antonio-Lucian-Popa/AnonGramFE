@@ -6,17 +6,47 @@ import {
   VoteRequest,
   ReportCreateRequest 
 } from '../types';
+import { PostFilters } from '../components/posts/PostFilters';
 
 // Get posts with pagination
-export const getPosts = async (page = 0, size = 10): Promise<PaginatedResponse<Post>> => {
+export const getPosts = async (
+  page = 0,
+  size = 10,
+  filters?: PostFilters
+): Promise<PaginatedResponse<Post>> => {
   try {
-    const response = await api.get<PaginatedResponse<Post>>(`/posts?page=${page}&size=${size}`);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+
+    if (filters?.searchTerm) {
+      params.append('search', filters.searchTerm);
+    }
+
+    if (filters?.radius) {
+      params.append('radius', filters.radius.toString());
+
+      // ⚠️ Trimite doar dacă radius este setat!
+      if (filters.latitude && filters.longitude) {
+        params.append('latitude', filters.latitude.toString());
+        params.append('longitude', filters.longitude.toString());
+      }
+    }
+
+    if (filters?.tags?.length) {
+      const joinedTags = filters.tags.join(',');
+      params.append('tags', joinedTags);
+    }
+
+    const response = await api.get<PaginatedResponse<Post>>(`/posts?${params}`);
     return response.data;
   } catch (error) {
     console.error('Get posts error:', error);
     throw error;
   }
 };
+
 
 // Get single post by ID
 export const getPostById = async (id: string): Promise<Post> => {

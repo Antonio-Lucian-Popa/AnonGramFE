@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, MapPin, Users } from 'lucide-react';
+import { Shield, MapPin, Users, Filter } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { PostList } from '../components/posts/PostList';
 import { getPosts } from '../services/posts';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
+import { PostFilters as FilterType } from '../components/posts/PostFilters';
+import { FilterModal } from '../components/posts/FilterModal';
 
 const Feature: React.FC<{
   icon: React.ReactNode;
@@ -25,6 +27,34 @@ export const HomePage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterType>({
+    searchTerm: '',
+    radius: 10,
+    tags: [],
+  });
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+  
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFilters((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+      },
+      (error) => {
+        console.warn('Location access denied or unavailable:', error);
+      }
+    );
+  }, []);
+
+  const handleApplyFilters = useCallback((newFilters: FilterType) => {
+    setFilters(newFilters);
+  }, []);
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -160,12 +190,26 @@ export const HomePage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-6">
-          Recent Posts
-        </h1>
+      <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-white">Recent Posts</h1>
+          <Button
+            variant="secondary"
+            leftIcon={<Filter className="h-4 w-4" />}
+            onClick={() => setIsFilterModalOpen(true)}
+          >
+            Filter Posts
+          </Button>
+        </div>
+
+        <FilterModal
+          isOpen={isFilterModalOpen}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApplyFilters={handleApplyFilters}
+          initialFilters={filters}
+        />
         
         <PostList 
-          fetchPosts={getPosts} 
+          fetchPosts={(page, size) => getPosts(page, size, filters)}
           emptyMessage="No posts yet. Be the first to share something!" 
         />
       </div>

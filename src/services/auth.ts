@@ -102,3 +102,26 @@ export const isAuthenticated = (): boolean => {
     return false;
   }
 };
+
+interface UserSettings {
+  defaultRadius: number;
+  emailNotifications: boolean;
+}
+
+export const updateUserSettings = async (userId: string, settings: UserSettings): Promise<void> => {
+  try {
+    await api.put(`/users/${userId}/settings`, settings);
+  } catch (error) {
+    console.error('Update settings error:', error);
+    throw error;
+  }
+};
+
+export const deleteAccount = async (userId: string): Promise<void> => {
+  try {
+    await api.delete(`/users/${userId}`);
+  } catch (error) {
+    console.error('Delete account error:', error);
+    throw error;
+  }
+};

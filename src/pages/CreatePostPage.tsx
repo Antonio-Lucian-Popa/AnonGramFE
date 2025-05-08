@@ -12,7 +12,8 @@ import { Button } from '../components/ui/Button';
 
 interface FormValues {
   text: string;
-  tag?: string;
+  tags: string[];
+  tagInput: string; // pentru input temporar
   useLocation: boolean;
   expiresIn: string;
 }
@@ -29,33 +30,36 @@ export const CreatePostPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { latitude, longitude, loading: locationLoading, error: locationError } = useGeolocation();
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  
-  const { 
-    register, 
-    handleSubmit, 
+
+  const {
+    register,
+    handleSubmit,
     watch,
-    formState: { errors } 
+    setValue, // ✅ Adaugă această linie
+    formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
       text: '',
-      tag: '',
+      tags: [],
       useLocation: false,
       expiresIn: '168', // Default to 7 days
     }
   });
-  
+
   const useLocationValue = watch('useLocation');
+  const tagInput = watch('tagInput');
+  const tags = watch('tags');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       const newImages = [...images, ...selectedFiles].slice(0, 4); // Max 4 images
       setImages(newImages);
-      
+
       // Create preview URLs
       const newPreviews = newImages.map(file => URL.createObjectURL(file));
       setPreviewUrls(newPreviews);
@@ -66,7 +70,7 @@ export const CreatePostPage: React.FC = () => {
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
-    
+
     // Clean up preview URL to prevent memory leaks
     URL.revokeObjectURL(previewUrls[index]);
     const newPreviews = [...previewUrls];
@@ -76,32 +80,32 @@ export const CreatePostPage: React.FC = () => {
 
   const onSubmit = async (data: FormValues) => {
     if (!user) return;
-    
+
     setSubmitting(true);
     try {
       // Calculate expiry date
       const hoursToAdd = parseInt(data.expiresIn, 10);
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + hoursToAdd);
-      
+
       // Format as ISO string
       const expiresAtString = expiresAt.toISOString();
-      
+
       const postData = {
         userId: user.id,
         text: data.text,
-        tag: data.tag && data.tag.startsWith('#') ? data.tag : `#${data.tag}`,
+        tags: data.tags,
         expiresAt: expiresAtString,
       };
-      
+
       // Add location if enabled
       if (data.useLocation && latitude !== null && longitude !== null) {
         Object.assign(postData, { latitude, longitude });
       }
-      
+
       // Create post with selected images
       const newPost = await createPost(postData, images.length > 0 ? images : undefined);
-      
+
       // Navigate to the newly created post
       navigate(`/post/${newPost.id}`);
     } catch (error) {
@@ -127,13 +131,13 @@ export const CreatePostPage: React.FC = () => {
             Create New Post
           </h1>
         </div>
-        
+
         <div className="bg-gray-800 rounded-lg shadow-lg p-6">
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextArea
               label="Your anonymous message"
               placeholder="Share your thoughts anonymously..."
-              {...register('text', { 
+              {...register('text', {
                 required: 'Post content is required',
                 minLength: {
                   value: 10,
@@ -146,19 +150,19 @@ export const CreatePostPage: React.FC = () => {
               })}
               error={errors.text?.message}
             />
-            
+
             <div className="mb-6">
               <label className="block text-gray-300 text-sm font-medium mb-1">
                 Images (optional)
               </label>
-              
+
               {previewUrls.length > 0 && (
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   {previewUrls.map((url, index) => (
                     <div key={index} className="relative rounded-md overflow-hidden h-32">
-                      <img 
-                        src={url} 
-                        alt={`Preview ${index}`} 
+                      <img
+                        src={url}
+                        alt={`Preview ${index}`}
                         className="w-full h-full object-cover"
                       />
                       <button
@@ -172,7 +176,7 @@ export const CreatePostPage: React.FC = () => {
                   ))}
                 </div>
               )}
-              
+
               {previewUrls.length < 4 && (
                 <div className="flex items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-6 hover:border-indigo-500 transition-colors">
                   <label className="flex flex-col items-center cursor-pointer">
@@ -194,23 +198,60 @@ export const CreatePostPage: React.FC = () => {
                 Max 4 images. Supported formats: JPG, PNG, GIF.
               </p>
             </div>
-            
+
             <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <Input
-                  label="Tag (optional)"
-                  placeholder="#confession"
-                  leftIcon={<Tag className="h-4 w-4 text-gray-400" />}
-                  {...register('tag', { 
-                    pattern: {
-                      value: /^#?\w+$/,
-                      message: 'Invalid tag format'
-                    }
-                  })}
-                  error={errors.tag?.message}
-                />
+              <div className="mb-6">
+                <label className="block text-gray-300 text-sm font-medium mb-1">Tags (optional)</label>
+
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    placeholder="Add tag (e.g. #confession)"
+                    value={tagInput}
+                    onChange={(e) => setValue('tagInput', e.target.value)}
+                    leftIcon={<Tag className="h-4 w-4 text-gray-400" />}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const tag = tagInput.trim();
+                      if (tag && /^#?\w{2,30}$/.test(tag)) {
+                        const normalized = tag.startsWith('#') ? tag : `#${tag}`;
+                        if (!tags.includes(normalized)) {
+                          setValue('tags', [...tags, normalized]);
+                          setValue('tagInput', '');
+                        }
+                      }
+                    }}
+                    disabled={!tagInput}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 bg-indigo-900/50 text-indigo-300 px-2 py-1 rounded-full text-sm"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setValue('tags', tags.filter((_, i) => i !== index))
+                          }
+                          className="hover:text-red-400 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-              
+
+
               <div>
                 <label className="block text-gray-300 text-sm font-medium mb-1">
                   Post expires in
@@ -227,7 +268,7 @@ export const CreatePostPage: React.FC = () => {
                 </select>
               </div>
             </div>
-            
+
             <div className="mt-6 bg-gray-700/30 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <label className="flex items-center text-gray-300">
@@ -241,31 +282,31 @@ export const CreatePostPage: React.FC = () => {
                     Include my location
                   </span>
                 </label>
-                
+
                 {useLocationValue && locationLoading && (
                   <span className="text-gray-400 text-sm">
                     Fetching location...
                   </span>
                 )}
               </div>
-              
+
               {useLocationValue && locationError && (
                 <p className="text-red-400 text-sm mt-1">
                   Error getting location: {locationError}
                 </p>
               )}
-              
+
               {useLocationValue && latitude && longitude && (
                 <p className="text-green-400 text-sm mt-1">
                   Location found! Your post will include geographic information.
                 </p>
               )}
-              
+
               <p className="text-xs text-gray-500 mt-1">
                 This helps people see posts from your area. You'll remain anonymous.
               </p>
             </div>
-            
+
             <div className="mt-6">
               <Button
                 type="submit"
