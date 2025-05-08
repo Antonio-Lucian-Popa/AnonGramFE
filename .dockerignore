@@ -1,0 +1,24 @@
+# Ignore node modules
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+
+# Ignore build artifacts
+dist
+build
+
+# Ignore configs
+.env
+.env.local
+.env.development
+
+# Ignore version control
+.git
+.gitignore
+
+# Ignore IDE settings
+.vscode
+.idea
+.DS_Store
