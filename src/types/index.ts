@@ -33,7 +33,7 @@ export interface Post {
   text: string;
   latitude?: number;
   longitude?: number;
-  tag?: string;
+  tags?: string[];
   images?: string[];
   createdAt: string;
   expiresAt: string;
