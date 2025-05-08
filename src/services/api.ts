@@ -2,6 +2,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { refreshToken } from './auth';
 import { API_URL } from '../utils/constants';
+import { PostCreateRequest } from '../types';
 
 // Create axios instance
 const api = axios.create({
@@ -13,7 +14,7 @@ const api = axios.create({
 
 // Add request interceptor to attach auth token
 api.interceptors.request.use((config) => {
-  if (!config.url?.includes('/auth/refresh')) {
+  if (!config.url?.includes('/auth/refresh') && !config.url?.includes('/auth/register') && !config.url?.includes('/auth/login')) {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -59,26 +60,27 @@ api.interceptors.response.use(
 export default api;
 
 // Helper to create form data requests
-export const createFormDataRequest = <T>(
-  data: T,
-  files?: File[] | null
+export const createFormDataRequest = (
+  postData: PostCreateRequest,
+  images?: File[]
 ): FormData => {
   const formData = new FormData();
-  
-  // Add JSON data
-  formData.append('post', new Blob([JSON.stringify(data)], { 
-    type: 'application/json' 
-  }));
-  
-  // Add files if provided
-  if (files && files.length > 0) {
-    files.forEach((file) => {
-      formData.append('images', file);
-    });
+
+  // Trimite întreg obiectul ca JSON
+  formData.append('post', new Blob(
+    [JSON.stringify(postData)], 
+    { type: 'application/json' }
+  ));
+
+  // Trimite fișierele
+  if (images && images.length > 0) {
+    images.forEach(file => formData.append('images', file));
   }
-  
+
   return formData;
 };
+
+
 
 export const multipartConfig: AxiosRequestConfig = {
   headers: {

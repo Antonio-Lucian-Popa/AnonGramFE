@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../ui/Button';
-import { MessageSquare, LogOut, User, PlusCircle } from 'lucide-react';
+import { MessageSquare, LogOut, User, PlusCircle, Settings } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, isLoggedIn, logout } = useAuth();
@@ -31,6 +31,16 @@ export const Header: React.FC = () => {
                 onClick={() => navigate('/create')}
               >
                 New Post
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<Settings className="h-4 w-4" />}
+                onClick={() => navigate('/settings')}
+                className="hidden sm:flex"
+              >
+                Settings
               </Button>
               
               <div className="flex items-center gap-2 text-gray-300 text-sm bg-gray-800 px-3 py-1 rounded-full">

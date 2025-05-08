@@ -10,6 +10,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { PostDetailPage } from './pages/PostDetailPage';
 import { CreatePostPage } from './pages/CreatePostPage';
 import { AdminPage } from './pages/AdminPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 function App() {
   return (
@@ -21,26 +22,35 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/post/:id" element={<PostDetailPage />} />
-          
+
           {/* Protected routes */}
-          <Route 
-            path="/create" 
+          <Route
+            path="/create"
             element={
               <ProtectedRoute>
                 <CreatePostPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/admin" 
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
             element={
               <ProtectedRoute adminOnly>
                 <AdminPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          
+
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

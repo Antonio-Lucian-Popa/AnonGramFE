@@ -48,7 +48,7 @@ export interface PostCreateRequest {
   text: string;
   latitude?: number;
   longitude?: number;
-  tag?: string;
+  tags?: string[];
   expiresAt?: string;
 }
 

@@ -46,8 +46,9 @@ export const PostList: React.FC<PostListProps> = ({
 
   // Initial load
   useEffect(() => {
+    setPage(0);
     loadPosts(0);
-  }, []);
+  }, [fetchPosts]);
 
   // Handle refresh
   const handleRefresh = () => {
