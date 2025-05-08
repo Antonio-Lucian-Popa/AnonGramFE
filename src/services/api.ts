@@ -12,16 +12,16 @@ const api = axios.create({
 });
 
 // Add request interceptor to attach auth token
-api.interceptors.request.use(
-  (config) => {
+api.interceptors.request.use((config) => {
+  if (!config.url?.includes('/auth/refresh')) {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  }
+  return config;
+});
+
 
 // Add response interceptor to handle token expiration
 api.interceptors.response.use(

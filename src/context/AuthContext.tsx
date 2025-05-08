@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User } from '../types';
 import { getCurrentUser, isAuthenticated, logout } from '../services/auth';
+import { setOnTokenRefreshed } from '../services/authHelpers';
 
 interface AuthContextType {
   user: User | null;
@@ -48,6 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check authentication status on mount
   useEffect(() => {
     refreshUser();
+  }, []);
+
+  useEffect(() => {
+    setOnTokenRefreshed(refreshUser);
+    return () => setOnTokenRefreshed(null);
   }, []);
 
   const value = {

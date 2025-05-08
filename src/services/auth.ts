@@ -7,6 +7,7 @@ import {
   TokenResponse 
 } from '../types';
 import { jwtDecode } from 'jwt-decode';
+import { getOnTokenRefreshed } from './authHelpers';
 
 // Register a new user
 export const register = async (userData: UserRegisterRequest): Promise<boolean> => {
@@ -42,13 +43,16 @@ export const refreshToken = async (): Promise<TokenResponse | null> => {
 
   try {
     const response = await api.post<TokenResponse>('/auth/refresh', {
-      refresh_token: refresh
+      refreshToken: refresh
     });
 
     const tokens = response.data;
 
     localStorage.setItem('access_token', tokens.access_token);
     localStorage.setItem('refresh_token', tokens.refresh_token);
+
+    const callback = getOnTokenRefreshed();
+    if (callback) callback();
 
     return tokens;
   } catch (error) {
