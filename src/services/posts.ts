@@ -26,13 +26,18 @@ export const getPosts = async (
 
     if (filters?.radius) {
       params.append('radius', filters.radius.toString());
+
+      // ⚠️ Trimite doar dacă radius este setat!
+      if (filters.latitude && filters.longitude) {
+        params.append('latitude', filters.latitude.toString());
+        params.append('longitude', filters.longitude.toString());
+      }
     }
 
     if (filters?.tags?.length) {
-      const joinedTags = filters.tags.join(','); // păstrăm #, dar trimitem într-un singur query param
+      const joinedTags = filters.tags.join(',');
       params.append('tags', joinedTags);
     }
-    
 
     const response = await api.get<PaginatedResponse<Post>>(`/posts?${params}`);
     return response.data;
@@ -41,6 +46,7 @@ export const getPosts = async (
     throw error;
   }
 };
+
 
 // Get single post by ID
 export const getPostById = async (id: string): Promise<Post> => {

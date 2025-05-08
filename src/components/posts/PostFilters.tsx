@@ -11,6 +11,8 @@ export interface PostFilters {
   searchTerm: string;
   radius: number;
   tags: string[];
+  latitude?: number;
+  longitude?: number;
 }
 
 const DEFAULT_RADIUS = 10; // km

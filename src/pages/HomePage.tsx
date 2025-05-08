@@ -35,6 +35,23 @@ export const HomePage: React.FC = () => {
     tags: [],
   });
 
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+  
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFilters((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+      },
+      (error) => {
+        console.warn('Location access denied or unavailable:', error);
+      }
+    );
+  }, []);
+
   const handleApplyFilters = useCallback((newFilters: FilterType) => {
     setFilters(newFilters);
   }, []);
