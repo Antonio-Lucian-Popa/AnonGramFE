@@ -31,6 +31,7 @@ export interface Post {
   id: string;
   userId: string;
   text: string;
+  userAlias: string;
   latitude?: number;
   longitude?: number;
   tags?: string[];
