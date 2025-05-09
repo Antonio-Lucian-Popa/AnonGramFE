@@ -41,6 +41,7 @@ export interface Post {
   upvotes: number;
   downvotes: number;
   commentCount: number;
+  currentUserVote: 1 | -1 | null;
   userVote?: 1 | -1 | null;
 }
 
