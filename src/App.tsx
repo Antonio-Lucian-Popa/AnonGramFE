@@ -15,7 +15,7 @@ import { SettingsPage } from './pages/SettingsPage';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={'/anongram-fe'}>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
