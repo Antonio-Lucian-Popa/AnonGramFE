@@ -17,7 +17,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
-  const [userVote, setUserVote] = useState<1 | -1 | null>(post.userVote || null);
+  const [userVote, setUserVote] = useState<1 | -1 | null>(post.currentUserVote || null);
 
   // Calculate net votes
   const netVotes = post.upvotes - post.downvotes;
@@ -154,7 +154,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
           <div className="flex items-center justify-between pt-3 border-t border-gray-700">
             {/* Vote Buttons */}
             <div className="flex items-center space-x-2">
-              <button
+            <button
                 onClick={() => handleVote(1)}
                 disabled={loading}
                 className={`flex items-center space-x-1 rounded-md px-2 py-1 ${userVote === 1 ? 'text-green-400 bg-green-900/30' : 'text-gray-400 hover:text-gray-200'
@@ -176,6 +176,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
               >
                 <ThumbsDown size={16} />
               </button>
+
             </div>
 
             <div className="flex items-center space-x-3">
