@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { DateTime } from 'luxon';
 import { ThumbsUp, ThumbsDown, MessageCircle, Flag, MapPin, Tag, Trash2 } from 'lucide-react';
 import { Post } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -23,7 +23,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdated }) => {
   const netVotes = post.upvotes - post.downvotes;
 
   // Format the creation date
-  const formattedDate = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const formattedDate = DateTime
+  .fromISO(post.createdAt, { zone: 'utc' })
+  .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  .toRelative(); // ex: "3 minutes ago"
 
   // Check if the logged in user is the post author
   const isAuthor = user?.id === post.userId;
