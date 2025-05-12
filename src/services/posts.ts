@@ -54,7 +54,7 @@ export const getUserPosts = async (
 ): Promise<PaginatedResponse<Post>> => {
   try {
     const response = await api.get<PaginatedResponse<Post>>(
-      `/user-profile/posts/?page=${page}&size=${size}`
+      `/posts/user-profile/posts/?page=${page}&size=${size}`
     );
     return response.data;
   } catch (error) {
