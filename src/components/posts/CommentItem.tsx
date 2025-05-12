@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { DateTime } from 'luxon';
 import { Trash2 } from 'lucide-react';
 import { Comment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -18,7 +18,10 @@ export const CommentItem: React.FC<CommentItemProps> = ({
   const [loading, setLoading] = useState(false);
   
   // Format the creation date
-  const formattedDate = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
+  const formattedDate = DateTime
+  .fromISO(comment.createdAt, { zone: 'utc' })
+  .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  .toRelative(); // ex: "3 minutes ago"
   
   // Check if the logged in user is the comment author
   const isAuthor = user?.id === comment.userId;
