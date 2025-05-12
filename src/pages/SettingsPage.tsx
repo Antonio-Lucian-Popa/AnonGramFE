@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle, User, MapPin, Trash2 } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, User, MapPin, Trash2, FileText } from 'lucide-react';
 import { Layout } from '../components/layout/Layout';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
@@ -99,6 +99,14 @@ export const SettingsPage: React.FC = () => {
                   disabled
                 />
               </div>
+
+              <Button
+                variant="secondary"
+                leftIcon={<FileText className="h-4 w-4" />}
+                onClick={() => navigate('/my-posts')}
+              >
+                View My Posts
+              </Button>
             </div>
           </div>
           

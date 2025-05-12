@@ -47,6 +47,22 @@ export const getPosts = async (
   }
 };
 
+// Get user's posts with pagination
+export const getUserPosts = async (
+  page = 0,
+  size = 10
+): Promise<PaginatedResponse<Post>> => {
+  try {
+    const response = await api.get<PaginatedResponse<Post>>(
+      `/user-profile/posts/?page=${page}&size=${size}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Get user posts error:`, error);
+    throw error;
+  }
+};
+
 
 // Get single post by ID
 export const getPostById = async (id: string): Promise<Post> => {
