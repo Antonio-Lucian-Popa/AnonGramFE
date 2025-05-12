@@ -59,6 +59,7 @@ export interface Comment {
   id: string;
   postId: string;
   userId: string;
+  userAlias: string;
   text: string;
   createdAt: string;
 }
